@@ -19,8 +19,12 @@
                 {
                     title : '{{event.title}}',
                     start : '{{event.start}}',
-                    end : '{{event.end}}'
+                    water : '{{event.water}}',
+                    ill : '{{event.ill}}',
+                    hum : '{{event.hum}}',
+                    tem : '{{event.tem}}',
                  },
+                 
                 {% endfor %}
                 ],
               });
@@ -29,6 +33,9 @@
           </script>
     </head>
     <body>
+      <nav class = "main-nav">
+        <a href="/"><button type = "submit", value="Button">Home</button></a>
+      </nav>
         <div class="container">
             <div id="calendar"></div>
         </div>
