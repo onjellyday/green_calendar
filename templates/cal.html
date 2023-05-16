@@ -39,5 +39,35 @@
         <div class="container">
             <div id="calendar"></div>
         </div>
+        {% if alltodo ==0 %}
+    <div class="p-3 mb-2 bg-dark text-white">NO DATA</div>
+    {% else %}
+    <div class = "container my-5">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">No</th>
+            <th scope="col">Plant Name</th>
+            <th scope="col">Water</th>
+            <th scope="col">Illuminace</th>
+            <th scope="col">Humidity</th>
+            <th scope="col">Temperture</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%for event in events%}
+          <tr>
+            <th scope="row">{{loop.index}}</th>
+            <td>{{event.title}}</td>
+            <td>{{event.water}}</td>
+            <td>{{event.ill}}</td>
+            <td>{{event.hum}}</td>
+            <td>{{event.tem}}</td>
+          </tr>
+          {%endfor%}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
     </body>
 </html>
