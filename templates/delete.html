@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            body {
+            box-sizing: border-box;
+            margin: 0px;
+            font-family: Consolas, monospace;
+          }
+          .del {
+            height: 50vh;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+          .but {
+            padding: 20px;
+            background-color: #7b75e9;
+          }
+            </style>
+    </head>
+  <body>
+    <nav class = "main-nav">
+        <a href="/"><button type = "submit", value="Button">Home</button></a>
+      </nav>
+    <form class="del" action="/delete" method="post">
+      <label for="title">Delete</label>
+      <input type="text" id="title" name="title">
+      <input type="submit" value="Delete">
+    </form>
+    {% if alltodo ==0 %}
+    <div class="p-3 mb-2 bg-dark text-white">NO DATA</div>
+    {% else %}
+    <div class = "container my-5">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">No</th>
+            <th scope="col">Plant Name</th>
+            <th scope="col">Species</th>
+            <th scope="col">Start</th>
+            <th scope="col">Next Water</th>
+            <th scope="col">Illuminace</th>
+            <th scope="col">Humidity</th>
+            <th scope="col">Temperture</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%for todo in alltodo%}
+          <tr>
+            <th scope="row">{{loop.index}}</th>
+            <td>{{todo.title}}</td>
+            <td>{{todo.species}}</td>
+            <td>{{todo.start}}</td>
+            <td>{{todo.water}}</td>
+            <td>{{todo.ill}}</td>
+            <td>{{todo.hum}}</td>
+            <td>{{todo.tem}}</td>
+          </tr>
+          {%endfor%}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </body>
+</html>

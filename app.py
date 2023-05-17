@@ -2,6 +2,7 @@ from flask import Flask,render_template,request,redirect,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
+import sqlite3
 
 
 app=Flask(__name__)
@@ -63,22 +64,34 @@ def add():
 
 @app.route('/vacuum')
 def vacuum_database():
-    self.con = sqlite3.connect(database.db)
-    self.con.execute("VACUUM")
-    self.con.colse()
+    conn = sqlite3.connect("database.db")
+    cursor=conn.cursor()
+    cursor.execute("VACUUM")
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-#    db.session.execute(text('VACUUM'))
-#    db.session.commit()
+    db.session.execute(text('VACUUM'))
+    db.session.commit()
     
     return 'Vacuum completed'
 
-#@app.route('/delete_event/<string:title>', methods=['POST'])
-#def delete_event(title):
-#    event = Todo.query.get_or_404(title)
-#    db.session.delete(event)
-#    db.session.commit()
-#    return redirect(url_for('add'))
+@app.route('/delete', methods=['GET','POST'])
+def delete_user():
+    if request.method == "POST":
+        title = request.form['title']
+        user = Todo.query.get(title)
+        if user:
+            db.session.delete(user)
+            db.session.commit()
+            
+        else:
+            return "User not found."
+    alltodo = Todo.query.all()
+    return render_template("delete.html",alltodo=alltodo)
+
+
 
 if __name__ == "__main__":
-    db.create_all()
-    app.run(debug=True,port=5000)
+    
+    app.run(debug=True,port=5000,use_reloader=True)
