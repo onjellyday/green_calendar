@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Radar Chart Example</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    #light{
+        background-color : yellow;
+    }
+    #humidity{
+        background-color : rgb(75, 26, 158);
+    }
+    #temperature{
+        background-color : rgb(179, 43, 48);
+    }
+  </style>
+</head>
+<body>
+  <nav class="main-nav">
+    <a href="{{ url_for('cal') }}"><button type="submit">Calendar</button></a>
+  </nav>
+  <div class="container">
+    <div id="chartContainer">
+      <canvas id="radarChart"></canvas>
+    </div>
+    <div id="dataContainer">
+      <table>
+        <thead>
+          <tr>
+            <th>환경</th>
+            <th></th>
+            <th>제어</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>조도</td>
+            <td></td>
+            <td id="light">{{ plant.ill }}</td>
+          </tr>
+          <tr>
+            <td>습도</td>
+            <td></td>
+            <td id="humidity">{{ plant.hum }}</td>
+          </tr>
+          <tr>
+            <td>온도</td>
+            <td></td>
+            <td id="temperature">{{ plant.tem }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Data for the radar chart
+    var data = {
+      labels: ['Illuminance', 'Humidity', 'Temperature'],
+      datasets: [
+        {
+          label: 'External weather',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          data: [{{ weather.ill }}, {{ weather.hum }}, {{ weather.tem }}]
+        },
+        {
+          label: 'Plant',
+          backgroundColor: 'rgba(54, 235, 150, 0.2)',
+          borderColor: 'rgba(54, 235, 150, 1)',
+          data: [{{ plant.ill }}, {{ plant.hum }}, {{ plant.tem }}]
+        },
+        {
+          label: 'Internal weather',
+          backgroundColor: 'rgba(54, 162, 235, 0.3)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          data: [{{ adu.ill }}, {{ adu.hum }}, {{ adu.tem }}]
+        }
+      ]
+    };
+
+    // Configuration options
+    var options = {
+      scale: {
+        ticks: {
+          beginAtZero: true,
+          min: 0,
+          max: 100,
+          stepSize: 20
+        }
+      }
+    };
+
+    // Create the radar chart
+    var ctx = document.getElementById('radarChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'radar',
+      data: data,
+      options: options
+    });
+  </script>
+</body>
+</html>

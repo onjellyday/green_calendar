@@ -13,6 +13,14 @@
             document.addEventListener('DOMContentLoaded', function() {
               var calendarEl = document.getElementById('calendar');
               var calendar = new FullCalendar.Calendar(calendarEl, {
+                eventClick: function(info) {
+      var eventObj = info.event;
+      var url = "/weather?title=" + encodeURIComponent(eventObj.title);
+        window.location.href = url;
+      }
+    
+
+      ,
                 initialView: 'dayGridMonth',
                 events : [
                 {% for event in events %}    
