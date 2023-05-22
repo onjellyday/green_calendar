@@ -3,8 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 import sqlite3
-from datetime import datetime
-
+from datetime import date
+import datetime
 
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///database.db'
@@ -56,9 +56,9 @@ def weather():
     plant = Todo.query.get(ptitle)
     #날씨 데이터 예시
     weather = {
-    'ill' : "50",
+    'ill' : "80",
     'hum' : "50",
-    'tem' : "50"
+    'tem' : "100"
     }
     #아두이노 예시
     adu_weather = {
@@ -118,7 +118,7 @@ def delete_user():
             db.session.commit()
             
         else:
-            return "User not found."
+            return "User not found.",render_template("home.html")
     alltodo = Todo.query.all()
     return render_template("delete.html",alltodo=alltodo)
 

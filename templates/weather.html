@@ -4,14 +4,9 @@
   <title>Radar Chart Example</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    #light{
-        background-color : yellow;
-    }
-    #humidity{
-        background-color : rgb(75, 26, 158);
-    }
-    #temperature{
-        background-color : rgb(179, 43, 48);
+    table{
+      width:30%;
+      border : 1px solid #444444;
     }
   </style>
 </head>
@@ -23,36 +18,99 @@
     <div id="chartContainer">
       <canvas id="radarChart"></canvas>
     </div>
+    
     <div id="dataContainer">
       <table>
         <thead>
           <tr>
             <th>환경</th>
-            <th></th>
-            <th>제어</th>
+            <th>{{plant.title}}</th>
+            <th>외부</th>
+            <th>내부</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>조도</td>
-            <td></td>
-            <td id="light">{{ plant.ill }}</td>
+            <td>{{plant.ill}}</td>
+            <td id="illuminance">{{ weather.ill }}</td>
+            <td id="adu_ill">{{ adu.ill }}</td>
           </tr>
           <tr>
             <td>습도</td>
-            <td></td>
-            <td id="humidity">{{ plant.hum }}</td>
+            <td>{{plant.hum}}</td>
+            <td id="humidity">{{ weather.hum }}</td>
+            <td id="adu_hum">{{ adu.hum }}</td>
           </tr>
           <tr>
             <td>온도</td>
-            <td></td>
-            <td id="temperature">{{ plant.tem }}</td>
+            <td>{{plant.hum}}</td>
+            <td id="temperature">{{ weather.tem }}</td>
+            <td id="adu_tem">{{ adu.tem }}</td>
           </tr>
         </tbody>
       </table>
+      <script>
+        
+        var ielement = document.getElementById("illuminance");
+        var helement = document.getElementById("humidity");
+        var telement = document.getElementById("temperature");
+        if ({{plant.ill}}=={{weather.ill}}) {
+          ielement.style.backgroundColor = "green";
+        } else if({{plant.ill}}>{{weather.ill}}){
+          ielement.style.backgroundColor = "blue";
+        }else{
+          ielement.style.backgroundColor = "red";
+        }
+
+        if ({{plant.hum}}=={{weather.hum}}) {
+          helement.style.backgroundColor = "green";
+        } else if({{plant.hum}}>{{weather.hum}}){
+          helement.style.backgroundColor = "blue";
+        }else{
+          helement.style.backgroundColor = "red";
+        }
+
+        if ({{plant.tem}}=={{weather.tem}}) {
+          telement.style.backgroundColor = "green";
+        } else if({{plant.tem}}>{{weather.tem}}){
+          telement.style.backgroundColor = "blue";
+        }else{
+          telement.style.backgroundColor = "red";
+        }
+        var aielement = document.getElementById("adu_ill");
+        var ahelement = document.getElementById("adu_hum");
+        var atelement = document.getElementById("adu_tem");
+        if ({{plant.ill}}=={{adu.ill}}) {
+          aielement.style.backgroundColor = "green";
+        } else if({{plant.ill}}>{{adu.ill}}){
+          aielement.style.backgroundColor = "blue";
+        }else{
+          aielement.style.backgroundColor = "red";
+        }
+
+        if ({{plant.hum}}=={{adu.hum}}) {
+          ahelement.style.backgroundColor = "green";
+        } else if({{plant.hum}}>{{adu.hum}}){
+          ahelement.style.backgroundColor = "blue";
+        }else{
+          ahelement.style.backgroundColor = "red";
+        }
+
+        if ({{plant.tem}}=={{adu.tem}}) {
+          atelement.style.backgroundColor = "green";
+        } else if({{plant.tem}}>{{adu.tem}}){
+          atelement.style.backgroundColor = "blue";
+        }else{
+          telement.style.backgroundColor = "red";
+        }
+
+
+       
+    </script>
     </div>
   </div>
-
+ 
   <script>
     // Data for the radar chart
     var data = {
