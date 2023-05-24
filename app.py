@@ -2,10 +2,12 @@ from flask import Flask,render_template,request,redirect,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import sessionmaker
 import sqlite3
-from datetime import date
-import datetime
-import test
+from datetime import date,datetime,timedelta
+from weather import final_avg_rhm,final_avg_ta
+
+
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
@@ -28,18 +30,6 @@ class Todo(db.Model):
 
 
 
-
-
-
-
-#새 이벤트 생성 조건문 짜기
-
-
-
-
-
-
-
 #db에 이미 있으면 생기는 오류 처리
 @app.errorhandler(IntegrityError)
 def handle_integrity_error(e):
@@ -48,6 +38,7 @@ def handle_integrity_error(e):
 #홈
 @app.route('/')
 def home():
+    
     return render_template("home.html")
 #캘린더에서 이름 클릭 시 날씨로 이동
 @app.route('/weather')
@@ -57,8 +48,8 @@ def weather():
     #날씨 데이터 예시
     weather = {
     'ill' : "80",
-    'hum' : "50",
-    'tem' : "100"
+    'hum' : final_avg_ta,
+    'tem' : final_avg_rhm 
     }
     #아두이노 예시
     adu_weather = {
@@ -71,8 +62,26 @@ def weather():
 #캘린더
 @app.route('/cal')
 def cal():
+    today = date.today()
+    after = today + timedelta(days=7)
+    after_str = after.strftime("%Y-%m-%d %H:%M:%S")
+    todos = Todo.query.all()
+    
+    for todo in todos:
+        if(todo.start<after_str) :
+            for todo in todos:
+                if(todo.water<after_str):
+                    new_water = datetime.strptime(todo.water, "%Y-%m-%d")+timedelta(days=int(todo.period))
+                    new_water_str = new_water.strftime("%Y-%m-%d")
+                    new_todo = Todo(title=todo.title+"o", species=todo.species, start=todo.water,water=new_water_str, ill=todo.ill,hum=todo.hum,tem=todo.tem, period=todo.period)        
+                    try:
+                        db.session.add(new_todo)
+                        db.session.commit()
+                    except IntegrityError as e:
+                        db.session.rollback()
     events=Todo.query.all()
     return render_template("cal.html",events=events)
+
 #식물 추가
 @app.route('/add', methods=['GET',"POST"])
 def add():
@@ -116,7 +125,9 @@ def delete_user():
         if user:
             db.session.delete(user)
             db.session.commit()
-            
+        elif(title=="0"):
+            db.session.query(Todo).delete()
+            db.session.commit()
         else:
             return "User not found.",render_template("home.html")
     alltodo = Todo.query.all()

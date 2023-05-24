@@ -18,7 +18,13 @@
             padding: 20px;
             background-color: #7b75e9;
           }
-            </style>
+          </style>
+        <script>
+          function checkInput() {
+            var input = document.getElementById("title").value;
+            
+          }
+        </script>
     </head>
   <body>
     <nav class = "main-nav">
@@ -26,9 +32,10 @@
       </nav>
     <form class="del" action="/delete" method="post">
       <label for="title">Delete</label>
-      <input type="text" id="title" name="title">
+      <input type="text" id="title" name="title" placeholder="0 입력 시 전부 삭제">
       <input type="submit" value="Delete">
     </form>
+    
     {% if alltodo ==0 %}
     <div class="p-3 mb-2 bg-dark text-white">NO DATA</div>
     {% else %}

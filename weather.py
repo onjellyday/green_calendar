@@ -31,8 +31,8 @@ for item in items:
     total_avg_rhm += avg_rhm
     count += 1
 
-final_avg_ta = total_avg_ta / count
-final_avg_rhm = total_avg_rhm / count
+final_avg_ta = round(total_avg_ta / count,1)
+final_avg_rhm = round(total_avg_rhm / count,1)
 
-print(f'최종 평균 온도: {final_avg_ta:.2f}')
-print(f'최종 평균 습도: {final_avg_rhm:.2f}')
+#print(f'최종 평균 온도: {final_avg_ta:.2f}')
+#print(f'최종 평균 습도: {final_avg_rhm:.2f}')
