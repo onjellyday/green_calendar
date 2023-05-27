@@ -45,6 +45,7 @@ def home():
 def weather():
     ptitle = request.args.get('title')
     plant = Todo.query.get(ptitle)
+    # ------- 바뀐 부분 -------
     #날씨 데이터 예시
     weather = {
         'ill': "80",
@@ -56,6 +57,8 @@ def weather():
     weather['tem'] = temperature
     weather['hum'] = humidity
 
+    # ------- 바뀐 부분 -------
+    
     #아두이노 예시
     adu_weather = {
     'ill' : "10",
