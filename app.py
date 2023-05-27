@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request,redirect,jsonify
+from flask import Flask,render_template,request,redirect,jsonify,url_for,session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
@@ -10,7 +10,8 @@ from weather import final_avg_rhm,final_avg_ta
 
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///database.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
+#app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
+app.secret_key = '1q2w3e4r'
 db=SQLAlchemy(app)
 app.app_context().push()
 
@@ -47,15 +48,15 @@ def weather():
     plant = Todo.query.get(ptitle)
     #날씨 데이터 예시
     weather = {
-    'ill' : "80",
+    'ill' : "60",
     'hum' : final_avg_ta,
     'tem' : final_avg_rhm 
     }
     #아두이노 예시
     adu_weather = {
-    'ill' : "10",
+    'ill' : "40",
     'hum' : "30",
-    'tem' : "20"
+    'tem' : "40"
 }
     return render_template("weather.html",weather=weather,plant=plant,adu=adu_weather)
 
@@ -64,16 +65,19 @@ def weather():
 def cal():
     today = date.today()
     after = today + timedelta(days=7)
-    after_str = after.strftime("%Y-%m-%d %H:%M:%S")
-    todos = Todo.query.all()
+    after_str = after.strftime("%Y-%m-%d")
     
-    for todo in todos:
-        if(todo.start<after_str) :
-            for todo in todos:
-                if(todo.water<after_str):
+    number=Todo.query.count()
+    for n in range(number):
+        todos = Todo.query.all()
+        for todo in todos:
+            for day in range(7):
+                if(todo.water==str(today + timedelta(days=day))) :
+                    #for todo in todos:
+                    #    if(todo.water<after_str):
                     new_water = datetime.strptime(todo.water, "%Y-%m-%d")+timedelta(days=int(todo.period))
                     new_water_str = new_water.strftime("%Y-%m-%d")
-                    new_todo = Todo(title=todo.title+"o", species=todo.species, start=todo.water,water=new_water_str, ill=todo.ill,hum=todo.hum,tem=todo.tem, period=todo.period)        
+                    new_todo = Todo(title=todo.title+"_", species=todo.species, start=todo.water,water=new_water_str, ill=todo.ill,hum=todo.hum,tem=todo.tem, period=todo.period)        
                     try:
                         db.session.add(new_todo)
                         db.session.commit()
@@ -83,17 +87,48 @@ def cal():
     return render_template("cal.html",events=events)
 
 #식물 추가
-@app.route('/add', methods=['GET',"POST"])
-def add():
-    if request.method == "POST":
-        title = request.form['title']
+@app.route('/set',methods=['GET','POST'])
+def set():
+    if request.method=='POST':
+        
         species = request.form['species']
+        session['species'] = species
+        return redirect(url_for('add'))
+    return render_template('set.html')
+
+@app.route('/add', methods=['GET','POST'])
+def add():
+    
+    species=session.get('species',None)
+    if request.method == 'POST':
+        title = request.form['title']
         start = request.form['start']
-        water = request.form['water']
+        period= request.form['period']
+        #water = request.form['water']
         ill = request.form['ill']
         hum = request.form['hum']
         tem = request.form['tem']
         instart = start[8:10]
+        water_day=int(instart)+int(period)
+        if(start[5:7]=="02"):
+            if(water_day>28):
+                water=start[0:5]+"03"+"-"+str(water-28)
+            else:
+                water=start[0:8]+str(water_day)
+        elif(int(start[5:7])%2==0):
+            if(water_day>30):
+                water=start[0:5]+str(int(start[5:7])+1)+"-"+str(water_day-30)
+            else:
+                water=start[0:8]+str(water_day)
+        else :
+            if(water_day>31):
+                water=start[0:5]+str(int(start[5:7])+1)+"-"+str(water_day-31)
+            else:
+                water=start[0:8]+str(water_day)
+        water_datetime=datetime.strptime(water, "%Y-%m-%d")
+        water=str(water_datetime)[0:10]
+
+        """
         inwater = water[8:10]
         if(inwater>instart) :
                 period = int(inwater) - int(instart)
@@ -104,6 +139,7 @@ def add():
                 period = 30 - int(instart) + int(inwater)
             else : 
                 period = 31 - int(instart) + int(inwater)
+                """
 
         todo = Todo(title=title, species=species, start=start,water=water, ill=ill,hum=hum,tem=tem, period=period)        
         try:
@@ -114,7 +150,7 @@ def add():
             return render_template("add_deny.html")
             
     alltodo = Todo.query.all()
-    return render_template("add.html",alltodo=alltodo)
+    return render_template("add.html",alltodo=alltodo,species=species)
     
 #식물 삭제
 @app.route('/delete', methods=['GET','POST'])
