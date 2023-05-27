@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Radar Chart Example</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    table{
+      width:30%;
+      border : 1px solid #444444;
+    }
+  </style>
+</head>
+<body>
+  <nav class="main-nav">
+    <a href="{{ url_for('cal') }}"><button type="submit">Calendar</button></a>
+  </nav>
+  <div class="container">
+    <div id="chartContainer">
+      <canvas id="radarChart"></canvas>
+    </div>
+    
+    <div id="dataContainer">
+      <table>
+        <thead>
+          <tr>
+            <th>환경</th>
+            <th>{{plant.title}}</th>
+            <th>외부</th>
+            <th>내부</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>조도</td>
+            <td>{{plant.ill}}</td>
+            <td id="illuminance">{{ weather.ill }}</td>
+            <td id="adu_ill">{{ adu.ill }}</td>
+          </tr>
+          <tr>
+            <td>습도</td>
+            <td>{{plant.hum}}</td>
+            <td id="humidity">{{ weather.hum }}</td>
+            <td id="adu_hum">{{ adu.hum }}</td>
+          </tr>
+          <tr>
+            <td>온도</td>
+            <td>{{plant.hum}}</td>
+            <td id="temperature">{{ weather.tem }}</td>
+            <td id="adu_tem">{{ adu.tem }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <script>
+        
+        var ielement = document.getElementById("illuminance");
+        var helement = document.getElementById("humidity");
+        var telement = document.getElementById("temperature");
+        if ({{plant.ill}}=={{weather.ill}}) {
+          ielement.style.backgroundColor = "green";
+        } else if({{plant.ill}}>{{weather.ill}}){
+          ielement.style.backgroundColor = "blue";
+        }else{
+          ielement.style.backgroundColor = "red";
+        }
+
+        if ({{plant.hum}}=={{weather.hum}}) {
+          helement.style.backgroundColor = "green";
+        } else if({{plant.hum}}>{{weather.hum}}){
+          helement.style.backgroundColor = "blue";
+        }else{
+          helement.style.backgroundColor = "red";
+        }
+
+        if ({{plant.tem}}=={{weather.tem}}) {
+          telement.style.backgroundColor = "green";
+        } else if({{plant.tem}}>{{weather.tem}}){
+          telement.style.backgroundColor = "blue";
+        }else{
+          telement.style.backgroundColor = "red";
+        }
+        var aielement = document.getElementById("adu_ill");
+        var ahelement = document.getElementById("adu_hum");
+        var atelement = document.getElementById("adu_tem");
+        if ({{plant.ill}}=={{adu.ill}}) {
+          aielement.style.backgroundColor = "green";
+        } else if({{plant.ill}}>{{adu.ill}}){
+          aielement.style.backgroundColor = "blue";
+        }else{
+          aielement.style.backgroundColor = "red";
+        }
+
+        if ({{plant.hum}}=={{adu.hum}}) {
+          ahelement.style.backgroundColor = "green";
+        } else if({{plant.hum}}>{{adu.hum}}){
+          ahelement.style.backgroundColor = "blue";
+        }else{
+          ahelement.style.backgroundColor = "red";
+        }
+
+        if ({{plant.tem}}=={{adu.tem}}) {
+          atelement.style.backgroundColor = "green";
+        } else if({{plant.tem}}>{{adu.tem}}){
+          atelement.style.backgroundColor = "blue";
+        }else{
+          telement.style.backgroundColor = "red";
+        }
+
+
+       
+    </script>
+    </div>
+  </div>
+ 
+  <script>
+    // Data for the radar chart
+    var data = {
+      labels: ['Illuminance', 'Humidity', 'Temperature'],
+      datasets: [
+        {
+          label: 'External weather',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          data: [{{ weather.ill }}, {{ weather.hum }}, {{ weather.tem }}]
+        },
+        {
+          label: 'Plant',
+          backgroundColor: 'rgba(54, 235, 150, 0.2)',
+          borderColor: 'rgba(54, 235, 150, 1)',
+          data: [{{ plant.ill }}, {{ plant.hum }}, {{ plant.tem }}]
+        },
+        {
+          label: 'Internal weather',
+          backgroundColor: 'rgba(54, 162, 235, 0.3)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          data: [{{ adu.ill }}, {{ adu.hum }}, {{ adu.tem }}]
+        }
+      ]
+    };
+
+    // Configuration options
+    var options = {
+      scale: {
+        ticks: {
+          beginAtZero: true,
+          min: 0,
+          max: 100,
+          stepSize: 20
+        }
+      }
+    };
+
+    // Create the radar chart
+    var ctx = document.getElementById('radarChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'radar',
+      data: data,
+      options: options
+    });
+  </script>
+</body>
+</html>
