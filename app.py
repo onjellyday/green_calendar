@@ -127,11 +127,12 @@ def add():
     get_plant_info(species)
     new_plant=User.query.filter_by(name=species).first()
     if new_plant is not None:
+        
         weatherd = {
-            'ill': new_plant.light,
-            'tem': new_plant.temperature,
-            'hum': new_plant.humidity,
-            'period':new_plant.watercycle
+            'ill': new_plant.light.replace(" ",""),
+            'tem': new_plant.temperature.replace(" ",""),
+            'hum': new_plant.humidity.replace(" ",""),
+            'period':new_plant.watercycle.replace(" ","")
         }
     else:
         weatherd = {
@@ -145,7 +146,6 @@ def add():
         title = request.form['title']
         start = request.form['start']
         period= request.form['period']
-        #water = request.form['water']
         ill = request.form['ill']
         hum = request.form['hum']
         tem = request.form['tem']

@@ -5,20 +5,32 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     table{
-      width:30%;
+      
+      margin : 25px auto;
+      width:50%;
       border : 1px solid #444444;
     }
+ .inform{
+  margin : 25px auto;
+  text-align : center;
+ }
+
+
+    
   </style>
 </head>
 <body>
   <nav class="main-nav">
     <a href="{{ url_for('cal') }}"><button type="submit">Calendar</button></a>
   </nav>
-  <div class="container">
+  <div class="container" id="container">
     <div id="chartContainer">
       <canvas id="radarChart"></canvas>
     </div>
-    
+    <div class = inform>
+    <span id="humElement"></span>
+    <span id="temElement"></span>
+  </div>
     <div id="dataContainer">
       <table>
         <thead>
@@ -51,58 +63,89 @@
         </tbody>
       </table>
       <script>
-        
+        var humElement = document.getElementById("humElement");
+        var temElement = document.getElementById("temElement");
+    
+        if({{weather.hum}}>40){
+          humElement.innerHTML = "강수가 예정되어 있고,";
+    } else {
+      humElement.innerHTML = "날씨가 습하지 않고,";
+        }
+        if({{weather.tem}}>30){
+          temElement.innerHTML = "더운 날씨가 예상됩니다.";
+    } else {
+      temElement.innerHTML = "선선한 날씨가 예상됩니다.";
+        }
+
         var ielement = document.getElementById("illuminance");
         var helement = document.getElementById("humidity");
         var telement = document.getElementById("temperature");
-        if ({{plant.ill}}=={{weather.ill}}) {
+        if ({{plant.ill}}+5>={{weather.ill}}&&{{plant.ill}}-5<={{weather.ill}}) {
           ielement.style.backgroundColor = 'rgb(50,230,50)';
-        } else if({{plant.ill}}>{{weather.ill}}){
+          ielement.innerHTML = "햇빛이 강합니다.";
+        } else if({{plant.ill}}+5<{{weather.ill}}){
           ielement.style.backgroundColor = 'rgb(60,60,230)';
+          ielement.innerHTML = "햇빛이 강하지 않습니다.";
         }else{
           ielement.style.backgroundColor = 'rgb(230,60,70)';
+          ielement.innerHTML = "햇빛이 약합니다.";
         }
 
-        if ({{plant.hum}}=={{weather.hum}}) {
+        if ({{plant.hum}}+5>={{weather.hum}}&&{{plant.hum}}-5<={{weather.hum}}) {
           helement.style.backgroundColor = 'rgb(50,230,50)';
-        } else if({{plant.hum}}>{{weather.hum}}){
+          helement.innerHTML = "식물에게 적정한 습도입니다.";
+        } else if({{plant.hum}}+5<{{weather.hum}}){
           helement.style.backgroundColor = 'rgb(60,60,230)';
+          helement.innerHTML = "식물 주위가 습합니다.";
         }else{
           helement.style.backgroundColor = 'rgb(230,60,70)';
+          helement.innerHTML = "식물 주위가 건조합니다.";
         }
 
-        if ({{plant.tem}}=={{weather.tem}}) {
+        if ({{plant.tem}}+5>={{weather.tem}}&&{{plant.tem}}+5<={{weather.tem}}) {
           telement.style.backgroundColor = 'rgb(50,230,50)';
-        } else if({{plant.tem}}>{{weather.tem}}){
+          telement.innerHTML = "식물 주변 온도가 적절합니다.";
+        } else if({{plant.tem}}+5<{{weather.tem}}){
           telement.style.backgroundColor = 'rgb(60,60,230)';
+          telement.innerHTML = "식물 주변 온도가 높습니다.";
         }else{
           telement.style.backgroundColor = 'rgb(230,60,70)';
+          telement.innerHTML = "식물 주변 온도가 낮습니다.";
         }
         var aielement = document.getElementById("adu_ill");
         var ahelement = document.getElementById("adu_hum");
         var atelement = document.getElementById("adu_tem");
-        if ({{plant.ill}}=={{adu.ill}}) {
+        if ({{plant.ill}}+5>={{adu.ill}}&&{{plant.ill}}-5<={{adu.ill}}) {
           aielement.style.backgroundColor = 'rgb(50,230,50)';
-        } else if({{plant.ill}}>{{adu.ill}}){
+          aielement.innerHTML = "햇빛이 적당합니다.";
+        } else if({{plant.ill}}+5<{{adu.ill}}){
           aielement.style.backgroundColor = 'rgb(60,60,230)';
+          aielement.innerHTML = "햇빛이 강합니다.";
         }else{
           aielement.style.backgroundColor = 'rgb(230,60,70)';
+          aielement.innerHTML = "햇빛이 약합니다.";
         }
 
-        if ({{plant.hum}}=={{adu.hum}}) {
+        if ({{plant.hum}}+5>={{adu.hum}}&&{{plant.hum}}-5<={{adu.hum}}) {
           ahelement.style.backgroundColor = 'rgb(50,230,50)';
-        } else if({{plant.hum}}>{{adu.hum}}){
+          ahelement.innerHTML = "식물에게 적정한 습도입니다.";
+        } else if({{plant.hum}}+5<{{adu.hum}}){
           ahelement.style.backgroundColor = 'rgb(60,60,230)';
+          ahelement.innerHTML = "식물 주위가 습합니다.";
         }else{
           ahelement.style.backgroundColor = 'rgb(230,60,70)';
+          ahelement.innerHTML = "식물 주위가 건조합니다.";
         }
 
-        if ({{plant.tem}}=={{adu.tem}}) {
+        if ({{plant.tem}}+5>={{adu.tem}}&&{{plant.tem}}-5<={{adu.tem}}) {
           atelement.style.backgroundColor = 'rgb(50,230,50)';
-        } else if({{plant.tem}}>{{adu.tem}}){
+          atelement.innerHTML = "식물 주변 온도가 적절합니다.";
+        } else if({{plant.tem}}+5<{{adu.tem}}){
           atelement.style.backgroundColor = 'rgb(60,60,230)';
+          atelement.innerHTML = "식물 주변 온도가 높습니다.";
         }else{
           telement.style.backgroundColor = 'rgb(230,60,70)';
+          atelement.innerHTML = "식물 주변 온도가 낮습니다.";
         }
 
 
@@ -139,12 +182,17 @@
 
     // Configuration options
     var options = {
+      responsive: true, // 반응형 설정
+    maintainAspectRatio: false, // 캔버스 요소 크기 유지 설정 해제
+    maxWidth: 917, // 최대 너비 설정
+    maxHeight: 917,
       scale: {
         ticks: {
           beginAtZero: true,
           min: 0,
           max: 100,
           stepSize: 20
+          
         }
       }
     };
