@@ -5,7 +5,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 import sqlite3
 from datetime import date,datetime,timedelta
-from weather import final_avg_rhm,final_avg_ta
+from weather import get_tmp_hum
+from plant_crawling import get_plant_info
 
 
 app=Flask(__name__)
@@ -48,10 +49,15 @@ def weather():
     plant = Todo.query.get(ptitle)
     #날씨 데이터 예시
     weather = {
-    'ill' : "60",
-    'hum' : final_avg_ta,
-    'tem' : final_avg_rhm 
+        'ill': "80",
+        'tem': '',
+        'hum': ''
     }
+    # get_tmp_hum 안에 식물 주기를 입력하면 지금까지의 평균 온도습도 뽑아냄
+    temperature, humidity = get_tmp_hum(int(plant.period))
+    weather['tem'] = temperature
+    weather['hum'] = humidity
+
     #아두이노 예시
     adu_weather = {
     'ill' : "40",
