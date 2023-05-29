@@ -34,26 +34,28 @@
           
           <p>
             <label for="period" class="form-label">Peiod</label>
-            <input type="text" class="form-control" id="period" name="period">
+            <input type="text" class="form-control" id="period" name="period"placeholder={{wea.period}} required>
           </p>
-          <script>$(function () {
+          <script>
+          $(function () {
             $("#datepicker_init_day").datepicker({dateFormat:'yy-mm-dd'});
             $("#datepicker_init_day").datepicker('setDate',new Date);
             var today = new Date(); // 오늘날짜가 만들어진다.
 console.log('오늘 날짜  => ' + today );
         });
+        
             </script>
           <div class="mb-3">
             <label for="ill" class="form-label">Illuminance</label>
-            <input type="text" class="form-control" name="ill" id="ill">
+            <input type="text" class="form-control" name="ill" id="ill" placeholder={{wea.ill}} required>
           </div>
           <div class="mb-3">
             <label for="hum" class="form-label">Humidity</label>
-            <input type="text" class="form-control" name="hum" id="hum">
+            <input type="text" class="form-control" name="hum" id="hum"placeholder={{wea.hum}} required>
           </div>
           <div class="mb-3">
             <label for="tem" class="form-label">Temperature</label>
-            <input type="text" class="form-control" name="tem" id="tem">
+            <input type="text" class="form-control" name="tem" id="tem"placeholder={{wea.tem}} required>
           </div>
           <button type="submit" class="btn btn-primary">Add</button>
           

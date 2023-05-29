@@ -10,14 +10,21 @@ from plant_crawling import get_plant_info
 
 
 app=Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///database.db'
-#app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
+app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///calendar.db'
+app.config['SQLALCHEMY_DATABASE_URI_2']='sqlite:///database.db'
+app.config['SQLALCHEMY_BINDS'] = {
+    'database1': 'sqlite:///calendar.db',  
+    'database2': 'sqlite:///database.db'  
+}
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
+
 app.secret_key = '1q2w3e4r'
 db=SQLAlchemy(app)
-app.app_context().push()
+#app.app_context().push()
 
 #식물 입력 모델
 class Todo(db.Model):
+    __bind_key__ = 'database1'
     title = db.Column(db.String(200), unique=True, primary_key=True,nullable=False)
     start = db.Column(db.String(300))
     water = db.Column(db.String(300))
@@ -30,7 +37,17 @@ class Todo(db.Model):
     def _repr_(self) -> str:
         return f"{self.title}-{self.species}-{self.start}-{self.water}-{self.ill}-{self.hum}-{self.tem}-{self.period}"
 
-
+class User(db.Model):
+    __tablename__ = 'users_plants'
+    __bind_key__ = 'database2'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text)
+    temperature = db.Column(db.Text)
+    humidity = db.Column(db.Text)
+    light = db.Column(db.Text)
+    watercycle = db.Column(db.Text)
+    water_detail = db.Column(db.Text)
+    
 
 #db에 이미 있으면 생기는 오류 처리
 @app.errorhandler(IntegrityError)
@@ -106,6 +123,24 @@ def set():
 def add():
     
     species=session.get('species',None)
+    
+    get_plant_info(species)
+    new_plant=User.query.filter_by(name=species).first()
+    if new_plant is not None:
+        weatherd = {
+            'ill': new_plant.light,
+            'tem': new_plant.temperature,
+            'hum': new_plant.humidity,
+            'period':new_plant.watercycle
+        }
+    else:
+        weatherd = {
+            'ill': "입력바랍니다",
+            'tem': "입력바랍니다",
+            'hum': "입력바랍니다",
+            'period':"입력바랍니다"
+        }
+    
     if request.method == 'POST':
         title = request.form['title']
         start = request.form['start']
@@ -134,18 +169,6 @@ def add():
         water_datetime=datetime.strptime(water, "%Y-%m-%d")
         water=str(water_datetime)[0:10]
 
-        """
-        inwater = water[8:10]
-        if(inwater>instart) :
-                period = int(inwater) - int(instart)
-        else :
-            if(start[5:7]=="02") :
-                period =  28- int(instart) + int(inwater)
-            elif(int(start[5:7])%2==0) :     
-                period = 30 - int(instart) + int(inwater)
-            else : 
-                period = 31 - int(instart) + int(inwater)
-                """
 
         todo = Todo(title=title, species=species, start=start,water=water, ill=ill,hum=hum,tem=tem, period=period)        
         try:
@@ -156,7 +179,7 @@ def add():
             return render_template("add_deny.html")
             
     alltodo = Todo.query.all()
-    return render_template("add.html",alltodo=alltodo,species=species)
+    return render_template("add.html",alltodo=alltodo,species=species,wea=weatherd)
     
 #식물 삭제
 @app.route('/delete', methods=['GET','POST'])

@@ -1,9 +1,6 @@
 from bs4 import BeautifulSoup as BS
 import requests as req
 import sqlite3
-
-#plants_name = input('식물의 이름을 입력하세요 : ')
-
 def get_plant_info(plants_name):
     url_1 = "https://fuleaf.com/search?term=" + plants_name
     res = req.get(url_1)
@@ -16,13 +13,7 @@ def get_plant_info(plants_name):
             links.append(link)
 
     if not links:
-        print("식물 정보가 존재하지 않습니다. 직접 입력해주세요!")
-        temperature = input("식물의 적정 온도를 입력해 주세요 : ")
-        humidity = input("식물의 적정 습도를 입력해 주세요 : ")
-        light = input("식물의 적정 조도를 입력해 주세요 : ")
-        watercycle = input("식물의 물주는 주기를 입력해 주세요 : ")
-        water_detail = input("식물의 물주는 방법을 입력해 주세요 : ")
-        # DB 생성 또는 연결
+        print("식물 정보가 존재하지 않습니다.")
         con = sqlite3.connect('database.db')
         cur = con.cursor()
 
@@ -39,18 +30,9 @@ def get_plant_info(plants_name):
             )
         ''')
         cur.execute("INSERT INTO users_plants (name, temperature, humidity, light, watercycle, water_detail) VALUES (?, ?, ?, ?, ?, ?)",
-                    (plants_name, temperature + "℃", humidity, light, watercycle, water_detail))
+                    (plants_name, None, None, None, None, None))
         con.commit()
         con.close
-        plant_info_dict = {
-            "temperature": temperature,
-            "humidity": humidity,
-            "light": light,
-            "watercycle": watercycle,
-            "water_detail": water_detail
-        }
-
-        return plant_info_dict
     else:
         print(links[0])
         code = links[0].split('/')[-1]
@@ -63,16 +45,10 @@ def get_plant_info(plants_name):
         plant_info2 = soup_2.select('.table-item-desc')
 
         if not plant_info:
-            print("식물 정보가 존재하지 않습니다. 직접 입력해주세요!")
-            temperature = input("식물의 적정 온도를 입력해 주세요 : ")
-            humidity = input("식물의 적정 습도를 입력해 주세요 : ")
-            light = input("식물의 적정 조도를 입력해 주세요 : ")
-            watercycle = input("식물의 물주는 주기를 입력해 주세요 : ")
-            water_detail = input("식물의 물주는 방법을 입력해 주세요 : ")
-            # DB 생성 또는 연결
+            print("식물 정보가 존재하지 않습니다.")
             con = sqlite3.connect('database.db')
             cur = con.cursor()
-        
+
             # 식물 정보 저장 테이블 생성
             cur.execute('''
                 CREATE TABLE IF NOT EXISTS users_plants (
@@ -86,18 +62,9 @@ def get_plant_info(plants_name):
                 )
             ''')
             cur.execute("INSERT INTO users_plants (name, temperature, humidity, light, watercycle, water_detail) VALUES (?, ?, ?, ?, ?, ?)",
-                        (plants_name, temperature + "℃", humidity, light, watercycle, water_detail))
+                    (plants_name, None, None, None, None, None))
             con.commit()
-            plant_info_dict = {
-                "temperature": temperature,
-                "humidity": humidity,
-                "light": light,
-                "watercycle": watercycle,
-                "water_detail": water_detail
-            }
-
-            return plant_info_dict
-
+            con.close
         plant_info_text = []
         for info in plant_info:
             plant_info_text.append(info.text.strip())
@@ -141,12 +108,3 @@ def get_plant_info(plants_name):
                     (plants_name, temperature + "℃", humidity, light, watercycle, water_detail))
         con.commit()
     con.close
-    plant_info_dict = {
-        "temperature": temperature,
-        "humidity": humidity,
-        "light": light,
-        "watercycle": watercycle,
-        "water_detail": water_detail
-    }
-
-    return plant_info_dict
