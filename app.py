@@ -1,6 +1,6 @@
 from flask import Flask,render_template,request,redirect,jsonify,url_for,session
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import text
+from sqlalchemy import text,or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 import sqlite3
@@ -53,35 +53,43 @@ class User(db.Model):
 @app.errorhandler(IntegrityError)
 def handle_integrity_error(e):
     return jsonify({'error': str(e)}), 400
+ # 500 오류에 대한 핸들러
+@app.errorhandler(500) 
+def internal_server_error(error):
+    return render_template('add_deny.html', error=error), 500
 
 #홈
 @app.route('/')
 def home():
     
     return render_template("home.html")
+
 #캘린더에서 이름 클릭 시 날씨로 이동
 @app.route('/weather')
 def weather():
     ptitle = request.args.get('title')
     plant = Todo.query.get(ptitle)
-    #날씨 데이터 예시
-    weather = {
-        'ill': "80",
-        'tem': '',
-        'hum': ''
-    }
-    # get_tmp_hum 안에 식물 주기를 입력하면 지금까지의 평균 온도습도 뽑아냄
     temperature, humidity = get_tmp_hum(int(plant.period))
-    weather['tem'] = temperature
-    weather['hum'] = humidity
+    weathers = {
+        'ill': plant.period,
+        'tem': temperature,
+        'hum': humidity
+    }
 
-    #아두이노 예시
     adu_weather = {
-    'ill' : "40",
-    'hum' : "30",
-    'tem' : "40"
-}
-    return render_template("weather.html",weather=weather,plant=plant,adu=adu_weather)
+        'ill': "40",
+        'hum': "30",
+        'tem': "40"
+    }
+
+    return render_template("weather.html", weather=weathers, plant=plant, adu=adu_weather)
+'''
+    if plant and plant.period is not None:
+        temperature, humidity = get_tmp_hum(int(plant.period))
+    else:
+        temperature, humidity = 50, 50
+'''
+    
 
 #캘린더
 @app.route('/cal')
@@ -90,24 +98,44 @@ def cal():
     after = today + timedelta(days=7)
     after_str = after.strftime("%Y-%m-%d")
     
-    number=Todo.query.count()
-    for n in range(number):
-        todos = Todo.query.all()
-        for todo in todos:
-            for day in range(7):
-                if(todo.water==str(today + timedelta(days=day))) :
-                    #for todo in todos:
-                    #    if(todo.water<after_str):
-                    new_water = datetime.strptime(todo.water, "%Y-%m-%d")+timedelta(days=int(todo.period))
-                    new_water_str = new_water.strftime("%Y-%m-%d")
-                    new_todo = Todo(title=todo.title+"_", species=todo.species, start=todo.water,water=new_water_str, ill=todo.ill,hum=todo.hum,tem=todo.tem, period=todo.period)        
+    todos = Todo.query.all()
+    for todo in todos:
+        for day in range(7):
+            if todo.water == str(today + timedelta(days=day)):
+                new_water = datetime.strptime(todo.water, "%Y-%m-%d") + timedelta(days=int(todo.period))
+                new_water_str = new_water.strftime("%Y-%m-%d")
+                
+                # Check if title already contains a suffix
+                if "_" in todo.title:
+                    prefix, suffix = todo.title.rsplit("_", 1)
                     try:
-                        db.session.add(new_todo)
-                        db.session.commit()
-                    except IntegrityError as e:
-                        db.session.rollback()
-    events=Todo.query.all()
-    return render_template("cal.html",events=events)
+                        suffix = int(suffix[:-2]) + 1  # Remove the "일차" suffix before converting to an integer
+                    except ValueError:
+                        suffix = 1
+                else:
+                    prefix = todo.title
+                    suffix = 1
+
+                new_title = f"{prefix}_{suffix}일차"
+                new_todo = Todo(
+                    title=new_title,
+                    species=todo.species,
+                    start=todo.water,
+                    water=new_water_str,
+                    ill=todo.ill,
+                    hum=todo.hum,
+                    tem=todo.tem,
+                    period=todo.period
+                )        
+                
+                try:
+                    db.session.add(new_todo)
+                    db.session.commit()
+                except IntegrityError as e:
+                    db.session.rollback()
+
+    events = Todo.query.all()
+    return render_template("cal.html", events=events)
 
 #식물 추가
 @app.route('/set',methods=['GET','POST'])
@@ -125,14 +153,16 @@ def add():
     species=session.get('species',None)
     
     get_plant_info(species)
-    new_plant=User.query.filter_by(name=species).first()
-    if new_plant is not None:
-        
+    con = sqlite3.connect('database.db')
+    cur = con.cursor()
+    cur.execute("SELECT * FROM users_plants WHERE name=?", (species,))
+    plants_data = cur.fetchone()
+    if plants_data[2] is not None:
         weatherd = {
-            'ill': new_plant.light.replace(" ",""),
-            'tem': new_plant.temperature.replace(" ",""),
-            'hum': new_plant.humidity.replace(" ",""),
-            'period':new_plant.watercycle.replace(" ","")
+            'ill': plants_data[4].replace(" ",""),
+            'tem': plants_data[2].replace(" ",""),
+            'hum': plants_data[3].replace(" ",""),
+            'period':plants_data[5].replace(" ","")
         }
     else:
         weatherd = {
@@ -182,23 +212,22 @@ def add():
     return render_template("add.html",alltodo=alltodo,species=species,wea=weatherd)
     
 #식물 삭제
-@app.route('/delete', methods=['GET','POST'])
+@app.route('/delete', methods=['GET', 'POST'])
 def delete_user():
     if request.method == "POST":
         title = request.form['title']
-        user = Todo.query.get(title)
-        if user:
-            db.session.delete(user)
-            db.session.commit()
-        elif(title=="0"):
-            db.session.query(Todo).delete()
-            db.session.commit()
-        else:
-            return "User not found.",render_template("home.html")
+
+        # Find all data with titles starting with the specified title
+        todos = Todo.query.filter(or_(Todo.title == title, Todo.title.like(f"{title}_%"))).all()
+
+        # Delete all matching data
+        for todo in todos:
+            db.session.delete(todo)
+
+        db.session.commit()
+
     alltodo = Todo.query.all()
-    return render_template("delete.html",alltodo=alltodo)
-
-
+    return render_template("delete.html", alltodo=alltodo)
 
 if __name__ == "__main__":
     
