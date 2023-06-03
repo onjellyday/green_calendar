@@ -11,10 +11,12 @@ from plant_crawling import get_plant_info
 
 app=Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///calendar.db'
-app.config['SQLALCHEMY_DATABASE_URI_2']='sqlite:///database.db'
+#app.config['SQLALCHEMY_DATABASE_URI_2']='sqlite:///database.db'
+#app.config['SQLALCHEMY_DATABASE_URI_3']='sqlite:///sensor_data.db'
 app.config['SQLALCHEMY_BINDS'] = {
     'database1': 'sqlite:///calendar.db',  
-    'database2': 'sqlite:///database.db'  
+    'database2': 'sqlite:///database.db',
+    'database3': 'sqlite:///sensor_data.db'    
 }
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
 
@@ -34,7 +36,7 @@ class Todo(db.Model):
     tem = db.Column(db.String(300))
     period = db.Column(db.String(300))
 
-    def _repr_(self) -> str:
+    def __repr__(self) -> str:
         return f"{self.title}-{self.species}-{self.start}-{self.water}-{self.ill}-{self.hum}-{self.tem}-{self.period}"
 
 class User(db.Model):
@@ -48,6 +50,15 @@ class User(db.Model):
     watercycle = db.Column(db.Text)
     water_detail = db.Column(db.Text)
     
+class SensorData(db.Model):
+    __tablename__ = 'sensor_data'
+    __bind_key__ = 'database3'
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime)
+    temperature = db.Column(db.Float)
+    humidity = db.Column(db.Float)
+    brightness = db.Column(db.Integer)
+
 
 #db에 이미 있으면 생기는 오류 처리
 @app.errorhandler(IntegrityError)
@@ -68,6 +79,7 @@ def home():
 @app.route('/weather')
 def weather():
     ptitle = request.args.get('title')
+    
     plant = Todo.query.get(ptitle)
     temperature, humidity = get_tmp_hum(int(plant.period))
     weathers = {
@@ -76,12 +88,12 @@ def weather():
         'hum': humidity
     }
 
+    sensor_data = SensorData.query.first()
     adu_weather = {
-        'ill': "40",
-        'hum': "30",
-        'tem': "40"
+        'ill': sensor_data.brightness,
+        'hum': sensor_data.humidity,
+        'tem': sensor_data.temperature
     }
-
     return render_template("weather.html", weather=weathers, plant=plant, adu=adu_weather)
 '''
     if plant and plant.period is not None:

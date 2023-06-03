@@ -76,15 +76,19 @@ def get_tmp_hum(period):
     while start_date <= end_date:
         cur.execute("SELECT * FROM calendar WHERE date=?",(start_date,))
         data = cur.fetchone()
-        tmp = data[1]
-        hum = data[2]
-        total_avg_tmp += float(tmp)
-        total_avg_hum += float(hum)
-        count += 1
-        start_date += datetime.timedelta(days=1)
+        if data[1] is None:
+            break
+        else :
+            tmp = data[1]
+            hum = data[2]
+            total_avg_tmp += float(tmp)
+            total_avg_hum += float(hum)
+            count += 1
+            start_date += datetime.timedelta(days=1)
     
     final_avg_tmp = total_avg_tmp / count
     final_avg_hum = total_avg_hum / count
     con.commit()
     con.close()
-    return "{:.2f}".format(final_avg_tmp), "{:.2f}".format(final_avg_hum)
+    return (final_avg_tmp), final_avg_hum
+    #return "{:.2f}".format(final_avg_tmp), "{:.2f}".format(final_avg_hum)
