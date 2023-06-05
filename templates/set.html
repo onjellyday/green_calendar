@@ -14,7 +14,16 @@
       background-repeat: no-repeat;
       background-position: center;
     }
+    .home-nav {
+      background-color: #000;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
 
+    .home-nav a {
+      text-decoration: none;
+      color: #fff;
+    }
     .main-nav {
       height: 100vh;
       display: flex;
@@ -24,7 +33,9 @@
 
     .my-4 {
       padding: 20px;
-      background-color: rgba(123, 117, 233, 0.8);
+      background-color: #5dd57d;
+      opacity : 0.6;
+      border-radius: 5px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -62,7 +73,11 @@
 </head>
 
 <body>
-  <a href="/"><button type="submit" value="Button">Home</button></a>
+  <nav class="home-nav">
+    <a href="/">
+      <button type="submit" class="btn btn-primary">Home</button>
+    </a>
+  </nav>
   <nav class="main-nav">
     <div class="my-4">
       <form action="/set" method="POST">

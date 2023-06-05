@@ -81,16 +81,17 @@ def weather():
     ptitle = request.args.get('title')
     
     plant = Todo.query.get(ptitle)
+    sensor_data = SensorData.query.first()
     temperature, humidity = get_tmp_hum(int(plant.period))
     weathers = {
-        'ill': plant.period,
+        'ill': (sensor_data.brightness)*0.0185, #햇빛 기준 lux -> micromol 
         'tem': temperature,
         'hum': humidity
     }
 
-    sensor_data = SensorData.query.first()
+    
     adu_weather = {
-        'ill': sensor_data.brightness,
+        'ill': (sensor_data.brightness)*0.0135,# 형광등 기준 lux -> micromol 
         'hum': sensor_data.humidity,
         'tem': sensor_data.temperature
     }

@@ -25,7 +25,9 @@
 
     .but {
       padding: 20px;
-      background-color: #7b75e9;
+      background-color: #5dd57d;
+      opacity : 0.8;
+      border-radius: 5px;
     }
 
     .but a {
@@ -55,9 +57,9 @@
   </div>
   <nav class="main-nav">
     <p class="but">
-      <a href="{{url_for('set')}}"><button type="submit" value="Button">Add</button></a>
-      <a href="{{url_for('delete_user')}}"><button type="submit" value="Button">Delete</button></a>
-      <a href="{{url_for('cal')}}"><button type="submit" value="Button">Calendar</button></a>
+      <a href="{{url_for('set')}}"><button type="submit" value="Button">추가하기</button></a>
+      <a href="{{url_for('delete_user')}}"><button type="submit" value="Button">삭제하기</button></a>
+      <a href="{{url_for('cal')}}"><button type="submit" value="Button">달력</button></a>
     </p>
   </nav>
 </body>
