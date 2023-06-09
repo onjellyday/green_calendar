@@ -69,11 +69,8 @@ def handle_integrity_error(e):
 def internal_server_error(error):
     return render_template('add_deny.html', error=error), 500
 
-#홈
-@app.route('/')
-def home():
-    
-    return render_template("home.html")
+
+
 
 #캘린더에서 이름 클릭 시 날씨로 이동
 @app.route('/weather')
@@ -105,6 +102,7 @@ def weather():
     
 
 #캘린더
+@app.route('/')
 @app.route('/cal')
 def cal():
     today = date.today()
@@ -113,7 +111,7 @@ def cal():
     
     todos = Todo.query.all()
     for todo in todos:
-        for day in range(7):
+        for day in range(14):
             if todo.water == str(today + timedelta(days=day)):
                 new_water = datetime.strptime(todo.water, "%Y-%m-%d") + timedelta(days=int(todo.period))
                 new_water_str = new_water.strftime("%Y-%m-%d")
@@ -129,7 +127,7 @@ def cal():
                     prefix = todo.title
                     suffix = 1
 
-                new_title = f"{prefix}_{suffix}일차"
+                new_title = f"{prefix}_{suffix}회차"
                 new_todo = Todo(
                     title=new_title,
                     species=todo.species,

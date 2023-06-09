@@ -66,17 +66,7 @@
         var humElement = document.getElementById("humElement");
         var temElement = document.getElementById("temElement");
     
-        if({{weather.hum}}>40){
-          humElement.innerHTML = "강수가 예정되어 있고,";
-    } else {
-      humElement.innerHTML = "날씨가 습하지 않고,";
-        }
-        if({{weather.tem}}>30){
-          temElement.innerHTML = "더운 날씨가 예상됩니다.";
-    } else {
-      temElement.innerHTML = "선선한 날씨가 예상됩니다.";
-        }
-
+      
         var ielement = document.getElementById("illuminance");
         var helement = document.getElementById("humidity");
         var telement = document.getElementById("temperature");
