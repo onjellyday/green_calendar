@@ -39,14 +39,55 @@
               calendar.render();
             });
           </script>
+          
+    <style>
+            
+    .main-nav {
+      background-color: #020902;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+
+    .main-nav a {
+      text-decoration: none;
+      color: #fff;
+    }
+    
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+
+    .btn-primary:hover {
+      background-color: #0069d9;
+      border-color: #0062cc;
+    }
+
+    .btn-primary:focus,
+    .btn-primary.focus {
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+    }
+          </style>
     </head>
     <body>
-      <nav class = "main-nav">
-        <a href="/"><button type = "submit", value="Button">Home</button></a>
+      <nav class="main-nav">
+        
+            <a href="{{url_for('set')}}">
+              <button type="submit"  class="btn btn-primary"value="Button">add</button>
+            </a>
+            <a href="{{url_for('delete_user')}}">
+              <button type="submit" value="Button" class="btn btn-primary">delete</button>
+            </a>
+            
+          
+        
       </nav>
         <div class="container">
             <div id="calendar"></div>
         </div>
+
+
+        <!--
         {% if alltodo ==0 %}
     <div class="p-3 mb-2 bg-dark text-white">NO DATA</div>
     {% else %}
@@ -77,5 +118,6 @@
       </table>
     </div>
     {% endif %}
+    -->
     </body>
 </html>

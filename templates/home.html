@@ -1,39 +1,67 @@
 <!DOCTYPE html>
-<html lang = "en">
-    <head>
-        <meta charset = "UTF-8">
-        <title> Welcome</title>
-        <style>
-        body {
-        box-sizing: border-box;
-        margin: 0px;
-        font-family: Consolas, monospace;
-      }
-      .main-nav {
-        height: 100vh;
-        background-color: #0ab13c;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .but {
-        padding: 20px;
-        background-color: #7b75e9;
-      }
-        </style>
-    </head>
-    <body>
-        <div>
-            <label for="title" class="form-label">Welcome to green calendar</label>
-           </div>
-           <nav class = "main-nav">
-            <p class="but">
-              <a href="{{url_for('add')}}"><button type = "submit", value="Button">Add</button></a>
-              <a href="{{url_for('delete_user')}}"><button type = "submit", value="Button">Delete</button></a>
-              <a href="{{url_for('cal')}}"><button type = "submit", value="Button">Calendar</button></a>
-            </p>
-          </nav>
-    </body>
-    
-        
-    
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0px;
+      font-family: Consolas, monospace;
+      background-image: url('https://cc-prod.scene7.com/is/image/CCProdAuthor/draw-trees_P1_900x420?$pjpeg$&jpegSize=200&wid=900');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .main-nav {
+      height: 100vh;
+      
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .but {
+      padding: 20px;
+      background-color: #5dd57d;
+      opacity : 0.8;
+      border-radius: 5px;
+    }
+
+    .but a {
+      margin: 0 10px;
+      text-decoration: none;
+    }
+
+    .but button {
+      background-color: #fff;
+      color: #7b75e9;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .but button:hover {
+      background-color: #ebe9f1;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <label for="title" class="form-label">Welcome to Green Calendar</label>
+  </div>
+  <nav class="main-nav">
+    <p class="but">
+      <a href="{{url_for('set')}}"><button type="submit" value="Button">추가하기</button></a>
+      <a href="{{url_for('delete_user')}}"><button type="submit" value="Button">삭제하기</button></a>
+      <a href="{{url_for('cal')}}"><button type="submit" value="Button">달력</button></a>
+    </p>
+  </nav>
+</body>
+
+</html>
