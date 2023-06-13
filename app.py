@@ -7,6 +7,7 @@ import sqlite3
 from datetime import date,datetime,timedelta
 from weather import get_tmp_hum_lux
 from plant_crawling import get_plant_info
+from weather_adu import get_adu
 
 
 app=Flask(__name__)
@@ -78,7 +79,6 @@ def weather():
     ptitle = request.args.get('title')
     
     plant = Todo.query.get(ptitle)
-    sensor_data = SensorData.query.first()
     temperature, humidity, lux = get_tmp_hum_lux(int(plant.period))
     convert_lux = 100 - lux *10
     weathers = {
@@ -87,11 +87,11 @@ def weather():
         'hum': humidity
     }
 
-    
+    adu_tmp, adu_hum, adu_lux = get_adu(int(plant.period))
     adu_weather = {
-        'ill': (sensor_data.brightness)*0.0135,# 형광등 기준 lux -> micromol 
-        'hum': sensor_data.humidity,
-        'tem': sensor_data.temperature
+        'ill': adu_lux*0.0135,# 형광등 기준 lux -> micromol 
+        'hum': adu_hum,
+        'tem': adu_tmp
     }
     return render_template("weather.html", weather=weathers, plant=plant, adu=adu_weather)
 '''
